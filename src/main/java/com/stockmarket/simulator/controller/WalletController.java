@@ -1,0 +1,65 @@
+package com.stockmarket.simulator.controller;
+
+import com.stockmarket.simulator.dto.StockOperationRequest;
+import com.stockmarket.simulator.dto.WalletResponse;
+import com.stockmarket.simulator.model.WalletStockId;
+import com.stockmarket.simulator.repository.WalletRepository;
+import com.stockmarket.simulator.repository.WalletStockRepository;
+import com.stockmarket.simulator.service.StockExchangeService;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/wallets")
+public class WalletController {
+    private final StockExchangeService service;
+    private final WalletStockRepository walletStockRepository;
+    private final WalletRepository walletRepository;
+
+    @PostMapping("/{walletId}/stocks/{stockName}")
+    public ResponseEntity<Void> operate(
+            @PathVariable String walletId,
+            @PathVariable String stockName,
+            @RequestBody StockOperationRequest request
+    ) throws BadRequestException, ChangeSetPersister.NotFoundException {
+        service.operate(walletId, stockName, request.type());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{walletId}")
+    public ResponseEntity<WalletResponse> getWallet(@PathVariable String walletId) {
+
+        if (!walletRepository.existsById(walletId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var stocks = walletStockRepository.findByIdWalletId(walletId)
+                .stream()
+                .map(ws -> new WalletResponse.StockItem(
+                        ws.getId().getStockName(),
+                        ws.getQuantity()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new WalletResponse(walletId, stocks));
+    }
+
+
+    @GetMapping("/{walletId}/stocks/{stockName}")
+    public ResponseEntity<Long> getWalletStock(
+            @PathVariable String walletId,
+            @PathVariable String stockName
+    ) {
+        var id = new WalletStockId(walletId, stockName);
+
+        return walletStockRepository.findById(id)
+                .map(ws -> ResponseEntity.ok(ws.getQuantity()))
+                .orElse(ResponseEntity.ok(0L));
+    }
+}
