@@ -2,13 +2,13 @@ package com.stockmarket.simulator.controller;
 
 import com.stockmarket.simulator.dto.StockOperationRequest;
 import com.stockmarket.simulator.dto.WalletResponse;
+import com.stockmarket.simulator.exception.BadRequestException;
 import com.stockmarket.simulator.exception.NotFoundException;
 import com.stockmarket.simulator.model.WalletStockId;
 import com.stockmarket.simulator.repository.WalletRepository;
 import com.stockmarket.simulator.repository.WalletStockRepository;
 import com.stockmarket.simulator.service.StockExchangeService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +33,7 @@ public class WalletController {
      * @return HTTP 200 on success
      */
     @PostMapping("/{walletId}/stocks/{stockName}")
-    public ResponseEntity<Void> operate(@PathVariable String walletId, @PathVariable String stockName, @RequestBody StockOperationRequest request) throws BadRequestException, NotFoundException {
+    public ResponseEntity<Void> operate(@PathVariable String walletId, @PathVariable String stockName, @RequestBody StockOperationRequest request) {
         service.operate(walletId, stockName, request.type());
         return ResponseEntity.ok().build();
     }
@@ -61,10 +61,15 @@ public class WalletController {
      *
      * @return stock quantity (0 if not present)
      */
+    // ✅
     @GetMapping("/{walletId}/stocks/{stockName}")
     public ResponseEntity<Long> getWalletStock(@PathVariable String walletId, @PathVariable String stockName) {
-        var id = new WalletStockId(walletId, stockName);
 
+        if (!walletRepository.existsById(walletId)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var id = new WalletStockId(walletId, stockName);
         return walletStockRepository.findById(id).map(ws -> ResponseEntity.ok(ws.getQuantity())).orElse(ResponseEntity.ok(0L));
     }
 }

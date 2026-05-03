@@ -67,12 +67,12 @@ function renderBank() {
       <div class="stock-row">
         <div class="stock-row-left">
           <span class="stock-name">${s.name}</span>
-          <span class="stock-qty">Dostępne: <span class="qty-val ${qtyClass}">${s.quantity}</span></span>
+          <span class="stock-qty">Available: <span class="qty-val ${qtyClass}">${s.quantity}</span></span>
         </div>
         <div class="stock-row-actions">
           <button class="btn btn-buy" onclick="trade('${s.name}', 'buy')"
             ${s.quantity === 0 ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>
-            KUP
+            BUY
           </button>
         </div>
       </div>`;
@@ -224,11 +224,11 @@ function renderWallet(stocks, isNew = false) {
     <div class="wallet-row">
       <div class="stock-row-left">
         <span class="stock-name">${s.name}</span>
-        <span class="stock-qty">W posiadaniu: <span class="qty-val">${s.quantity}</span></span>
+        <span class="stock-qty">Owned: <span class="qty-val">${s.quantity}</span></span>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="wallet-badge">×${s.quantity}</span>
-        <button class="btn btn-sell" onclick="trade('${s.name}', 'sell')">SPRZEDAJ</button>
+        <button class="btn btn-sell" onclick="trade('${s.name}', 'sell')">SELL</button>
       </div>
     </div>
   `).join('');
@@ -271,7 +271,7 @@ function renderLog() {
         <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
-        BRAK OPERACJI
+        NO OPERATIONS
       </div>`;
         return;
     }

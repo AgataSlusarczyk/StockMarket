@@ -1,5 +1,6 @@
 package com.stockmarket.simulator.model;
 
+import com.stockmarket.simulator.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public class WalletStock {
         if (this.quantity > 0) {
             this.quantity -= 1;
         } else {
-            throw new RuntimeException("Incorrect quantity");
+            throw new BadRequestException("No stock in wallet");
         }
     }
 

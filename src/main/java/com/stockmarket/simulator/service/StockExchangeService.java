@@ -8,6 +8,7 @@ import com.stockmarket.simulator.repository.BankStockRepository;
 import com.stockmarket.simulator.repository.WalletRepository;
 import com.stockmarket.simulator.repository.WalletStockRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StockExchangeService {
     private final BankStockRepository bankStockRepository;
     private final WalletStockRepository walletStockRepository;
@@ -22,7 +24,7 @@ public class StockExchangeService {
     private final AuditLogRepository auditLogRepository;
 
     @Transactional
-    public void operate(String walletId, String stockName, String type) {
+    public void operate(String walletId, String stockName, String type){
         switch (type) {
             case "buy" -> buy(walletId, stockName);
             case "sell" -> sell(walletId, stockName);
@@ -30,13 +32,20 @@ public class StockExchangeService {
         }
     }
 
-    private void buy(final String walletId, final String stockName) {
+    private void buy(final String walletId, final String stockName){
         BankStock bankStock = bankStockRepository.findForUpdate(stockName).orElseThrow(NotFoundException::new);
         if (bankStock.getQuantity() == 0) {
             throw new BadRequestException("No stock in bank");
         }
 
-        walletRepository.findById(walletId).orElseGet(() -> walletRepository.save(new Wallet(walletId)));
+        walletRepository.findById(walletId)
+                .orElseGet(() -> {
+                    try {
+                        return walletRepository.saveAndFlush(new Wallet(walletId));
+                    } catch (DataIntegrityViolationException e) {
+                        return walletRepository.findById(walletId).orElseThrow();
+                    }
+                });
 
         WalletStock walletStock = walletStockRepository
                 .findForUpdate(walletId, stockName)
@@ -53,9 +62,15 @@ public class StockExchangeService {
 
     private void sell(final String walletId, final String stockName) {
         BankStock bankStock = bankStockRepository
-                .findForUpdate(stockName).orElseThrow(NotFoundException::new);
+                .findForUpdate(stockName)
+                .orElseThrow(() -> new NotFoundException("Stock not found: " + stockName));
 
-        WalletStock walletStock = walletStockRepository.findForUpdate(walletId, stockName)
+        if (!walletRepository.existsById(walletId)) {
+            throw new NotFoundException("Wallet not found: " + walletId);
+        }
+
+        WalletStock walletStock = walletStockRepository
+                .findForUpdate(walletId, stockName)
                 .orElseThrow(() -> new BadRequestException("No stock in wallet"));
 
         if (walletStock.getQuantity() == 0) {
@@ -64,6 +79,9 @@ public class StockExchangeService {
 
         walletStock.decreaseQuantity();
         bankStock.increaseQuantity();
+
+        walletStockRepository.save(walletStock);
+        bankStockRepository.save(bankStock);
 
         auditLogRepository.save(new AuditLogEntry(null, "sell", walletId, stockName, Instant.now()));
     }

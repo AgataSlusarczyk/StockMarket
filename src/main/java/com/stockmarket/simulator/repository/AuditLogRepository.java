@@ -15,5 +15,5 @@ public interface AuditLogRepository extends JpaRepository<AuditLogEntry, Long> {
     /**
      * Returns all log entries ordered by creation order.
      */
-    List<AuditLogEntry> findAllByOrderByIdAsc();
+    List<AuditLogEntry> findAllByOrderByTimestampAsc();
 }

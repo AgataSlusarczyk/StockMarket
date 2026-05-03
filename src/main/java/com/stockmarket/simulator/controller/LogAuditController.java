@@ -26,14 +26,7 @@ public class LogAuditController {
      */
     @GetMapping
     public ResponseEntity<AuditLogResponse> getLog() {
-        var log = auditLogRepository.findAllByOrderByIdAsc()
-                .stream()
-                .map(entry -> new AuditLogResponse.LogItem(
-                        entry.getType(),
-                        entry.getWalletId(),
-                        entry.getStockName()
-                ))
-                .toList();
+        var log = auditLogRepository.findAllByOrderByTimestampAsc().stream().map(entry -> new AuditLogResponse.LogItem(entry.getType(), entry.getWalletId(), entry.getStockName())).toList();
         return ResponseEntity.ok(new AuditLogResponse(log));
     }
 }

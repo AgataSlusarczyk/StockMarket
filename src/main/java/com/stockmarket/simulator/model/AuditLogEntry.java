@@ -25,7 +25,11 @@ public class AuditLogEntry {
     private Long id;
 
     private String type;
+
+    @Column(name = "wallet_id")
     private String walletId;
+
+    @Column(name = "stock_name")
     private String stockName;
 
     private Instant timestamp;

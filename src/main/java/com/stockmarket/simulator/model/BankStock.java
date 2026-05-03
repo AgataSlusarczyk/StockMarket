@@ -1,5 +1,6 @@
 package com.stockmarket.simulator.model;
 
+import com.stockmarket.simulator.exception.BadRequestException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -28,11 +29,11 @@ public class BankStock {
         this.quantity += 1;
     }
 
-    public void decreaseQuantity() {
+    public void decreaseQuantity(){
         if (this.quantity > 0) {
             this.quantity -= 1;
         } else {
-            throw new RuntimeException("No stock in bank");
+            throw new BadRequestException("No stock in bank");
         }
     }
 
