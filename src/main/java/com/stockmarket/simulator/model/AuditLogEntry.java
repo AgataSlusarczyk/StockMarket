@@ -8,6 +8,11 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+/**
+ * Audit log entry for wallet operations.
+ * <p>
+ * Stores only successful buy/sell actions.
+ */
 @Entity
 @Table(name = "audit_log")
 @Getter

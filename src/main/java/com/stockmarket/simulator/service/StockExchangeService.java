@@ -32,7 +32,7 @@ public class StockExchangeService {
 
     private void buy(final String walletId, final String stockName) {
         BankStock bankStock = bankStockRepository.findForUpdate(stockName).orElseThrow(NotFoundException::new);
-        if(bankStock.getQuantity() == 0){
+        if (bankStock.getQuantity() == 0) {
             throw new BadRequestException("No stock in bank");
         }
 
@@ -58,7 +58,7 @@ public class StockExchangeService {
         WalletStock walletStock = walletStockRepository.findForUpdate(walletId, stockName)
                 .orElseThrow(() -> new BadRequestException("No stock in wallet"));
 
-        if(walletStock.getQuantity() == 0){
+        if (walletStock.getQuantity() == 0) {
             throw new BadRequestException("No stock in wallet");
         }
 

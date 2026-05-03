@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Stock holding inside a Wallet.
+ * <p>
+ * Composite key: walletId + stockName.
+ */
 @Entity
 @Table(name = "wallet_stocks")
 @Getter
@@ -24,9 +29,9 @@ public class WalletStock {
     }
 
     public void decreaseQuantity() {
-        if(this.quantity > 0) {
+        if (this.quantity > 0) {
             this.quantity -= 1;
-        }else {
+        } else {
             throw new RuntimeException("Incorrect quantity");
         }
     }

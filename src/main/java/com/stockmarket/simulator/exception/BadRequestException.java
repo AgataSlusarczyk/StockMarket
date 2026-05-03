@@ -3,6 +3,11 @@ package com.stockmarket.simulator.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * Exception for invalid client requests.
+ * <p>
+ * Mapped to HTTP 400.
+ */
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {
 

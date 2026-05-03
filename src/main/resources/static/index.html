@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StockSim — Symulator Giełdy</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>StockSim</title>
+    <link rel="stylesheet" href="style.css"/>
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="app.js" defer></script>
 </head>
@@ -37,7 +37,7 @@
 <main>
 
     <div class="ticker-bar" id="ticker-bar">
-        <span class="ticker-item" style="color:var(--text-dim)">ŁADOWANIE NOTOWAŃ...</span>
+        <span class="ticker-item" style="color:var(--text-dim)">LOADING ...</span>
     </div>
 
     <section class="panel">
@@ -47,7 +47,7 @@
             <path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h7"/>
             <path d="M16 19l2 2 4-4"/>
           </svg>
-          Portfel
+          Wallet
         </span>
             <span id="wallet-header-id" style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--blue)"></span>
         </div>
@@ -56,28 +56,29 @@
             <input
                     id="wallet-id"
                     type="text"
-                    placeholder="ID portfela (np. user123)"
+                    placeholder="Wallet Id (eg. user123)"
                     onkeydown="if(event.key==='Enter') loadWallet()"
             />
             <button class="btn btn-load" onclick="loadWallet()">
                 <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
                 </svg>
-                WCZYTAJ
+                READ
             </button>
         </div>
 
         <div class="stats-row">
             <div class="stat-item">
-                <span class="stat-label">W banku</span>
+                <span class="stat-label">In bank</span>
                 <span class="stat-value green" id="stat-total-qty">—</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Rodzaje</span>
+                <span class="stat-label">Types</span>
                 <span class="stat-value" id="stat-types">—</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Operacje</span>
+                <span class="stat-label">Operation</span>
                 <span class="stat-value" id="stat-log-count">—</span>
             </div>
         </div>
@@ -89,7 +90,7 @@
                     <circle cx="17" cy="17" r="4"/>
                     <path d="M17 15v2l1 1"/>
                 </svg>
-                WPISZ ID PORTFELA
+                Type wallet id
             </div>
         </div>
     </section>
@@ -100,7 +101,7 @@
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
           </svg>
-          Bank / Rynek
+          Bank
         </span>
             <button class="btn btn-ghost" style="padding:4px 8px" onclick="refreshBank()">
                 <svg id="refresh-icon-bank" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -115,18 +116,18 @@
                 <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
                 </svg>
-                ŁADOWANIE...
+                LOADING...
             </div>
         </div>
 
         <div class="init-section">
-            <span class="section-label">Dodaj akcje do banku</span>
+            <span class="section-label">Add stocks to bank</span>
 
             <div class="input-row">
                 <input
                         id="new-stock-name"
                         type="text"
-                        placeholder="Nazwa (np. AAPL)"
+                        placeholder="Name (eg. AAPL)"
                         style="text-transform:uppercase"
                 />
                 <input
@@ -137,7 +138,7 @@
                         style="width:90px;flex:none"
                 />
                 <button class="btn btn-primary" onclick="addPendingStock()">
-                    + DODAJ
+                    + ADD
                 </button>
             </div>
 
@@ -149,7 +150,7 @@
                     <polyline points="17 21 17 13 7 13 7 21"/>
                     <polyline points="7 3 7 8 15 8"/>
                 </svg>
-                USTAW STAN BANKU
+                SET BANK STATE
             </button>
         </div>
     </section>
@@ -164,7 +165,7 @@
             <line x1="16" y1="17" x2="8" y2="17"/>
             <polyline points="10 9 9 9 8 9"/>
           </svg>
-          Historia Operacji
+          Operation History
         </span>
             <button class="btn btn-ghost" style="padding:4px 8px" onclick="refreshLog(false);spinRefresh('refresh-icon-log')">
                 <svg id="refresh-icon-log" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -179,7 +180,7 @@
                 <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                BRAK OPERACJI
+                NO OPERATION
             </div>
         </div>
     </section>

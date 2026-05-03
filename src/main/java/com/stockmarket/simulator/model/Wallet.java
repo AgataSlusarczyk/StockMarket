@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Wallet entity representing a user container for stocks.
+ */
 @Entity
 @Table(name = "wallets")
 @Getter

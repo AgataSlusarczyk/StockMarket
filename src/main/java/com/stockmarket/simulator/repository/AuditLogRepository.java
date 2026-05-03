@@ -6,8 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository for audit log entries.
+ */
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLogEntry, Long> {
 
+    /**
+     * Returns all log entries ordered by creation order.
+     */
     List<AuditLogEntry> findAllByOrderByIdAsc();
 }

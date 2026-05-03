@@ -8,6 +8,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents stock available in the Bank.
+ * <p>
+ * Bank is the single liquidity provider.
+ */
 @Entity
 @Table(name = "bank_stocks")
 @Getter
@@ -24,9 +29,9 @@ public class BankStock {
     }
 
     public void decreaseQuantity() {
-        if(this.quantity > 0) {
+        if (this.quantity > 0) {
             this.quantity -= 1;
-        }else {
+        } else {
             throw new RuntimeException("No stock in bank");
         }
     }

@@ -2,8 +2,15 @@ package com.stockmarket.simulator.dto;
 
 import java.util.List;
 
+/**
+ * Response for Bank state.
+ */
 public record BankResponse(
         List<StockItem> stocks
 ) {
-    public record StockItem(String name, long quantity) {}
+    /**
+     * Bank stock item.
+     */
+    public record StockItem(String name, long quantity) {
+    }
 }
