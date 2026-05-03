@@ -50,6 +50,8 @@ start.bat 8080
 ---
 
 # Notes
+Docker **must be running** for the application to work properly when using Docker setup
+If Docker is not running, `docker-compose up --build` will fail
 Replace 8080 with any available port (XXXX).  
 Application will be available at:
 http://localhost:XXXX
