@@ -1,170 +1,192 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Market Simulator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockSim — Symulator Giełdy</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="app.js" defer></script>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
+<body>
 
-    <nav class="border-b border-gray-800 p-4 mb-8 glass sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i data-lucide="trending-up" class="text-emerald-400"></i>
-                <span class="font-bold text-xl tracking-tight">StockSim <span class="text-emerald-500 text-xs italic">v1.0</span></span>
-            </div>
-            <button onclick="triggerChaos()" class="bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2 rounded-lg border border-red-800 transition-all flex items-center gap-2">
-                <i data-lucide="zap" size="18"></i> Chaos Mode
+<nav>
+    <div class="nav-brand">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+        </svg>
+        StockSim
+        <span class="ticker">LIVE</span>
+    </div>
+
+    <div class="nav-right">
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            SYSTEM ONLINE
+        </div>
+        <button id="chaos-btn" class="btn btn-chaos" onclick="triggerChaos()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+            CHAOS MODE
+        </button>
+    </div>
+</nav>
+
+<main>
+
+    <div class="ticker-bar" id="ticker-bar">
+        <span class="ticker-item" style="color:var(--text-dim)">ŁADOWANIE NOTOWAŃ...</span>
+    </div>
+
+    <section class="panel">
+        <div class="panel-header">
+        <span class="panel-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h7"/>
+            <path d="M16 19l2 2 4-4"/>
+          </svg>
+          Portfel
+        </span>
+            <span id="wallet-header-id" style="font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--blue)"></span>
+        </div>
+
+        <div class="input-row">
+            <input
+                    id="wallet-id"
+                    type="text"
+                    placeholder="ID portfela (np. user123)"
+                    onkeydown="if(event.key==='Enter') loadWallet()"
+            />
+            <button class="btn btn-load" onclick="loadWallet()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                WCZYTAJ
             </button>
         </div>
-    </nav>
 
-    <main class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        <!-- KOLUMNA 1: Portfel -->
-        <section class="lg:col-span-1 space-y-6">
-            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i data-lucide="wallet" class="text-blue-400"></i> Twój Portfel
-                </h2>
-                <div class="flex gap-2 mb-6">
-                    <input id="walletId" type="text" placeholder="ID Portfela (np. user123)" class="bg-gray-800 border-gray-700 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500 outline-none">
-                    <button onclick="refreshWallet()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition-colors">
-                        Wczytaj
-                    </button>
-                </div>
-                <div id="walletContent" class="space-y-3">
-                    <p class="text-gray-500 italic text-sm text-center">Wpisz ID portfela, aby zobaczyć stan posiadania.</p>
-                </div>
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-label">W banku</span>
+                <span class="stat-value green" id="stat-total-qty">—</span>
             </div>
-        </section>
-
-        <!-- KOLUMNA 2: Rynek (Bank) -->
-        <section class="lg:col-span-1 space-y-6">
-            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold flex items-center gap-2">
-                        <i data-lucide="landmark" class="text-emerald-400"></i> Dostępne Akcje
-                    </h2>
-                    <button onclick="refreshBank()" class="text-gray-400 hover:text-white transition-colors">
-                        <i data-lucide="refresh-cw" size="18"></i>
-                    </button>
-                </div>
-                <div id="bankContent" class="space-y-4">
-                    <!-- Dynamiczne akcje -->
-                </div>
-                <hr class="border-gray-800 my-6">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-400 mb-2 uppercase tracking-widest">Inicjalizacja Banku (JSON)</h3>
-                    <textarea id="bankInitJson" rows="3" class="bg-gray-800 border-gray-700 rounded-lg p-2 w-full text-xs font-mono mb-2" placeholder='{"stocks": [{"name":"BTC", "quantity":10}]}'></textarea>
-                    <button onclick="initBank()" class="w-full bg-emerald-700/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-800 p-2 rounded-lg transition-all">
-                        Ustaw Stan Banku
-                    </button>
-                </div>
+            <div class="stat-item">
+                <span class="stat-label">Rodzaje</span>
+                <span class="stat-value" id="stat-types">—</span>
             </div>
-        </section>
-
-        <!-- KOLUMNA 3: Logi (Audit Log) -->
-        <section class="lg:col-span-1 space-y-6">
-            <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl h-[600px] flex flex-col">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i data-lucide="history" class="text-purple-400"></i> Historia Operacji
-                </h2>
-                <div id="auditLogs" class="overflow-y-auto flex-grow space-y-2 pr-2 text-sm font-mono">
-                    <!-- Logi -->
-                </div>
+            <div class="stat-item">
+                <span class="stat-label">Operacje</span>
+                <span class="stat-value" id="stat-log-count">—</span>
             </div>
-        </section>
+        </div>
 
-    </main>
+        <div class="scroll-area" id="wallet-stocks">
+            <div class="empty-state">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h7"/>
+                    <circle cx="17" cy="17" r="4"/>
+                    <path d="M17 15v2l1 1"/>
+                </svg>
+                WPISZ ID PORTFELA
+            </div>
+        </div>
+    </section>
 
-    <script>
-        // Inicjalizacja ikon
-        lucide.createIcons();
+    <section class="panel">
+        <div class="panel-header">
+        <span class="panel-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+          </svg>
+          Bank / Rynek
+        </span>
+            <button class="btn btn-ghost" style="padding:4px 8px" onclick="refreshBank()">
+                <svg id="refresh-icon-bank" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M1 4v6h6M23 20v-6h-6"/>
+                    <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/>
+                </svg>
+            </button>
+        </div>
 
-        async function apiCall(path, method = 'GET', body = null) {
-            const options = { method, headers: { 'Content-Type': 'application/json' } };
-            if (body) options.body = JSON.stringify(body);
-            try {
-                const res = await fetch(path, options);
-                if (!res.ok) throw await res.text();
-                return res.headers.get('content-type')?.includes('application/json') ? await res.json() : await res.text();
-            } catch (err) {
-                alert(`Błąd: ${err}`);
-                return null;
-            }
-        }
+        <div class="scroll-area" id="bank-stocks" style="max-height:200px">
+            <div class="empty-state">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M3 12l9-9 9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+                </svg>
+                ŁADOWANIE...
+            </div>
+        </div>
 
-        async function refreshBank() {
-            const data = await apiCall('/stocks');
-            if (!data) return;
-            const container = document.getElementById('bankContent');
-            container.innerHTML = data.stocks.map(s => `
-                <div class="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl border border-gray-700">
-                    <div>
-                        <span class="font-bold text-emerald-400">${s.name}</span>
-                        <span class="text-xs text-gray-500 ml-2">Dostępne: ${s.quantity}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="trade('${s.name}', 'buy')" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-1 rounded shadow-lg transition-all">KUP</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+        <div class="init-section">
+            <span class="section-label">Dodaj akcje do banku</span>
 
-        async function refreshWallet() {
-            const id = document.getElementById('walletId').value;
-            if(!id) return alert("Podaj ID portfela!");
-            const data = await apiCall(`/wallets/${id}`);
-            if (!data) return;
-            const container = document.getElementById('walletContent');
-            container.innerHTML = data.stocks.length ? data.stocks.map(s => `
-                <div class="flex justify-between items-center bg-blue-900/10 p-3 rounded-xl border border-blue-900/30">
-                    <span>${s.name} <b class="text-blue-400">x${s.quantity}</b></span>
-                    <button onclick="trade('${s.name}', 'sell')" class="bg-rose-600 hover:bg-rose-500 text-xs px-3 py-1 rounded shadow-lg transition-all">SPRZEDAJ</button>
-                </div>
-            `).join('') : '<p class="text-center text-gray-500">Portfel jest pusty.</p>';
-            refreshLogs();
-        }
+            <div class="input-row">
+                <input
+                        id="new-stock-name"
+                        type="text"
+                        placeholder="Nazwa (np. AAPL)"
+                        style="text-transform:uppercase"
+                />
+                <input
+                        id="new-stock-qty"
+                        type="number"
+                        value="100"
+                        min="1"
+                        style="width:90px;flex:none"
+                />
+                <button class="btn btn-primary" onclick="addPendingStock()">
+                    + DODAJ
+                </button>
+            </div>
 
-        async function trade(stockName, type) {
-            const id = document.getElementById('walletId').value || 'anonymous';
-            document.getElementById('walletId').value = id;
-            await apiCall(`/wallets/${id}/stocks/${stockName}`, 'POST', { type });
-            refreshBank();
-            refreshWallet();
-        }
+            <div id="pending-stocks" style="display:flex;flex-direction:column;gap:6px;min-height:32px"></div>
 
-        async function refreshLogs() {
-            const data = await apiCall('/log');
-            if (!data) return;
-            const container = document.getElementById('auditLogs');
-            container.innerHTML = data.log.reverse().map(l => `
-                <div class="p-2 border-l-2 ${l.type === 'buy' ? 'border-emerald-500 bg-emerald-500/5' : 'border-rose-500 bg-rose-500/5'} mb-2">
-                    <span class="text-gray-400">[${l.type.toUpperCase()}]</span> <b>${l.stock_name}</b> <br/>
-                    <span class="text-[10px] text-gray-500">ID: ${l.wallet_id}</span>
-                </div>
-            `).join('');
-        }
+            <button class="btn btn-primary" onclick="sendBankStocks()" style="width:100%;justify-content:center">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                    <polyline points="17 21 17 13 7 13 7 21"/>
+                    <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                USTAW STAN BANKU
+            </button>
+        </div>
+    </section>
 
-        async function initBank() {
-            const json = document.getElementById('bankInitJson').value;
-            await apiCall('/stocks', 'POST', JSON.parse(json));
-            refreshBank();
-        }
+    <section class="panel">
+        <div class="panel-header">
+        <span class="panel-title">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Historia Operacji
+        </span>
+            <button class="btn btn-ghost" style="padding:4px 8px" onclick="refreshLog(false);spinRefresh('refresh-icon-log')">
+                <svg id="refresh-icon-log" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M1 4v6h6M23 20v-6h-6"/>
+                    <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/>
+                </svg>
+            </button>
+        </div>
 
-        function triggerChaos() {
-            if(confirm("Czy na pewno chcesz zabić tę instancję?")) apiCall('/chaos', 'POST');
-        }
+        <div class="scroll-area" id="audit-log">
+            <div class="empty-state">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                BRAK OPERACJI
+            </div>
+        </div>
+    </section>
 
-        // Auto-refresh banku co 5 sekund
-        setInterval(refreshBank, 5000);
-        refreshBank();
-    </script>
+</main>
+
+<div id="toast-container"></div>
+
 </body>
 </html>

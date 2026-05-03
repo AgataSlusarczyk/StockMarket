@@ -2,13 +2,13 @@ package com.stockmarket.simulator.controller;
 
 import com.stockmarket.simulator.dto.StockOperationRequest;
 import com.stockmarket.simulator.dto.WalletResponse;
+import com.stockmarket.simulator.exception.NotFoundException;
 import com.stockmarket.simulator.model.WalletStockId;
 import com.stockmarket.simulator.repository.WalletRepository;
 import com.stockmarket.simulator.repository.WalletStockRepository;
 import com.stockmarket.simulator.service.StockExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +27,7 @@ public class WalletController {
             @PathVariable String walletId,
             @PathVariable String stockName,
             @RequestBody StockOperationRequest request
-    ) throws BadRequestException, ChangeSetPersister.NotFoundException {
+    ) throws BadRequestException, NotFoundException {
         service.operate(walletId, stockName, request.type());
         return ResponseEntity.ok().build();
     }

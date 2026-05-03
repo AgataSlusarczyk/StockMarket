@@ -15,7 +15,6 @@ public class ChaosController {
     public ResponseEntity<Void> chaos() {
         log.warn("CHAOS requested – shutting down this instance NOW");
 
-        // Osobny wątek żeby odpowiedź zdążyła wrócić do klienta
         Thread.ofVirtual().start(() -> {
             try { Thread.sleep(100); } catch (InterruptedException ignored) {}
             Runtime.getRuntime().halt(1);
